@@ -9,6 +9,7 @@ const express = require("express");
 const FavoriteDoctor = require("./schema/FavoriteDoctor");
 const FavoriteCompanion = require("./schema/FavoriteCompanion");
 const router = express.Router();
+const fetch = require("node-fetch");
 
 
 // completely resets your database.
@@ -33,330 +34,169 @@ router.route("/")
 // ---------------------------------------------------
 // Edit below this line
 // ---------------------------------------------------
-router.route("/doctors")
-    .get((req, res) => {
-        console.log("GET /doctors");
 
-        // already implemented:
-        Doctor.find({})
+//GET where image is favorited (date (key) -> is_favorited?) 
+//Inputs: .date (YYYY-MM-DD) from body
+//Outputs: image or null
+//{
+//     "date": "2021-05-18",
+//     "explanation": "What celestial body wears the Necklace Nebula? First, analyses indicate that the Necklace is a planetary nebula, a gas cloud emitted by a star toward the end of its life. Also, what appears to be diamonds in the Necklace are actually bright knots of glowing gas.  In the center of the Necklace Nebula are likely two stars orbiting so close together that they share a common atmosphere and appear as one in the featured image by the Hubble Space Telescope.  The red-glowing gas clouds on the upper left and lower right are the results of jets from the center.  Exactly when and how the bright jets formed remains a topic of research.  The Necklace Nebula is only about 5,000 years old, spans about 5 light years, and can best be found with a large telescope toward the direction of the constellation of the Arrow (Sagitta).",
+//     "hdurl": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_2029.jpg",
+//     "media_type": "image",
+//     "service_version": "v1",
+//     "title": "Jets from the Necklace Nebula",
+//     "url": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_960.jpg"
+// }
+
+//POST favorites
+//Inputs: image (json object)(copyright, date, explanation, hdurl, media_type, service_version, title, url)
+//Outputs: 200 OK 
+
+//DELETE favorites
+//Inputs: .date
+//Outputs: 200 OK
+
+//GET NASA images (a weeks worth)
+//https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}&start_date=2021-05-13&end_date=2021-05-19
+//Set Start Date to today date - 7 days and end_date to today's date
+//Inputs: 
+//Outputs: images from api key or if that doesn't work: {response: [images]}
+
+//GET all favorites
+//Inputs: nothing
+//Outputs: images from MongoDB
+// images: [{
+//     "date": "2021-05-18",
+//     "explanation": "What celestial body wears the Necklace Nebula? First, analyses indicate that the Necklace is a planetary nebula, a gas cloud emitted by a star toward the end of its life. Also, what appears to be diamonds in the Necklace are actually bright knots of glowing gas.  In the center of the Necklace Nebula are likely two stars orbiting so close together that they share a common atmosphere and appear as one in the featured image by the Hubble Space Telescope.  The red-glowing gas clouds on the upper left and lower right are the results of jets from the center.  Exactly when and how the bright jets formed remains a topic of research.  The Necklace Nebula is only about 5,000 years old, spans about 5 light years, and can best be found with a large telescope toward the direction of the constellation of the Arrow (Sagitta).",
+//     "hdurl": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_2029.jpg",
+//     "media_type": "image",
+//     "service_version": "v1",
+//     "title": "Jets from the Necklace Nebula",
+//     "url": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_960.jpg"
+// },
+// {
+//     "copyright": "Jason Guenzel",
+//     "date": "2021-05-19",
+//     "explanation": "Normally faint and elusive, the Jellyfish Nebula is caught in this alluring scene. In the telescopic field of view two bright yellowish stars, Mu and Eta Geminorum, stand just below and above the Jellyfish Nebula at the left. Cool red giants, they lie at the foot of the celestial twin. The Jellyfish Nebula itself floats below and left of center, a bright arcing ridge of emission with dangling tentacles. In fact, the cosmic jellyfish is part of bubble-shaped supernova remnant IC 443, the expanding debris cloud from a massive star that exploded. Light from that explosion first reached planet Earth over 30,000 years ago. Like its cousin in astrophysical waters the Crab Nebula supernova remnant, the Jellyfish Nebula is known to harbor a neutron star, the remnant of the collapsed stellar core. Composed on April 30, this telescopic snapshot also captures Mars. Now wandering through early evening skies, the Red Planet also shines with a yellowish glow on the right hand side of the field of view. Of course, the Jellyfish Nebula is about 5,000 light-years away, while Mars is currently almost 18 light-minutes from Earth.",
+//     "hdurl": "https://apod.nasa.gov/apod/image/2105/Guenzel-JellyfishMars30APR2021.jpg",
+//     "media_type": "image",
+//     "service_version": "v1",
+//     "title": "The Jellyfish and Mars",
+//     "url": "https://apod.nasa.gov/apod/image/2105/Guenzel-JellyfishMars30APR2021_1000.jpg"
+// }]
+
+router.route("/images")
+    .get((req, res) => {
+        console.log(`GET /images`);
+        var end_date = new Date().toISOString().slice(0, 10)
+        var start_date = new Date()
+        start_date.setDate(start_date.getDate() - 7)
+        start_date = start_date.toISOString().slice(0, 10)
+        console.log("today's date is: ", end_date)
+        console.log("start date is: ", start_date)
+        console.log("")
+        fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}&start_date=${start_date}&end_date=${end_date}`)
+            .then(response => response.json())
             .then(data => {
-                res.status(200).send(data);
-            })
-            .catch(err => {
-                res.status(500).send(err);
-            });
-    })
-    .post((req, res) => {
-        console.log("POST /doctors");
-        Doctor.create({
-            "name": req.body.name,
-            "seasons": req.body.seasons
-        }).save()
-            .then(doctor => {
-                res.status(201).send(doctor)
-            })
-            .catch(err => {
-                res.status(500).send("Bad data for creating doctor")
+                res.status(200).send(data)
             })
     });
 
-// optional:
-router.route("/doctors/favorites")
+router.route("/images/favorited")
     .get((req, res) => {
-        console.log(`GET /doctors/favorites`);
-        FavoriteDoctor.find({})
-            .then(favorite_doctors => {
-                let favorite_doctors_ids = []
-                favorite_doctors.forEach(function (favorite_doctor){
-                    favorite_doctors_ids.push(favorite_doctor.doctor)
-                })
-                Doctor.find({_id: {$in: favorite_doctors_ids}})
-                    .then(doctors => {
-                        res.status(200).send(doctors)
-                    })
-            })
-            .catch(err => {
-                res.status(500).send(err)
-            })
-    })
-    .post((req, res) => {
-        console.log(`POST /doctors/favorites`);
-        Doctor.findOne({_id: req.body.doctor_id})
-            .then(doctor => {
-                FavoriteDoctor.findOne({doctor: req.body.doctor_id})
-                    .then(doctor2 => {
-                        if (doctor2){
-                            res.status(500).send("Already in favorites.")
-                        }
-                        else {
-                            // console.log("found doctor is: ", doctor)
-                            if (doctor) {
-                                FavoriteDoctor.create(doctor._id).save()
-                                .then(favorite_doctor => {
-                                    res.status(201).send(doctor)
-                                })
-                            }
-                            else  {
-                                res.status(500).send("Doctor not found")
-                            }
-                        }
-                        
-                    })
-                
-            })
-            .catch(err => {
-                //console.log("err2 is: ", err)
-                res.status(500).send("Bad data for creating doctor favorite")
-            })
-    });
-    
-router.route("/doctors/:id")
-    .get((req, res) => {
-        console.log(`GET /doctors/${req.params.id}`);
-        Doctor.findById(req.params.id)
-            .then(doctor => {
-                res.status(200).send(doctor)
-            })
-            .catch(err => {
-                res.status(404).send("Couldn't find doctor")
-            })
-    })
-    .patch((req, res) => {
-        console.log(`PATCH /doctors/${req.params.id}`);
-        Doctor.findOneAndUpdate(
-            {_id: req.params.id},
-            req.body,
-            {new: true}
-        ).then(doctor => {
-            if (doctor) {
-                res.status(200).send(doctor)
+        console.log(`GET /images/favorited`);
+        // Images.findOne({date: req.body.date})
+        //     .then(response => {
+        //         if (response)
+        //             res.status(200).send(response)
+        //         else
+        //             res.status(404).send(null)
+        //     })
+        var data = {
+                "date": "2021-05-18",
+                "explanation": "What celestial body wears the Necklace Nebula? First, analyses indicate that the Necklace is a planetary nebula, a gas cloud emitted by a star toward the end of its life. Also, what appears to be diamonds in the Necklace are actually bright knots of glowing gas.  In the center of the Necklace Nebula are likely two stars orbiting so close together that they share a common atmosphere and appear as one in the featured image by the Hubble Space Telescope.  The red-glowing gas clouds on the upper left and lower right are the results of jets from the center.  Exactly when and how the bright jets formed remains a topic of research.  The Necklace Nebula is only about 5,000 years old, spans about 5 light years, and can best be found with a large telescope toward the direction of the constellation of the Arrow (Sagitta).",
+                "hdurl": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_2029.jpg",
+                "media_type": "image",
+                "service_version": "v1",
+                "title": "Jets from the Necklace Nebula",
+                "url": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_960.jpg"
             }
-            else {
-                res.status(404).send("Doctor not found.")
-            }
-        }).catch(() => res.status(501).send("Request was unsuccessful"))
+        res.status(200).send(data)
     })
     .delete((req, res) => {
-        console.log(`DELETE /doctors/${req.params.id}`);
-        Doctor.findOneAndDelete({_id: req.params.id})
-            .then (response => {
-                if (response)
-                    res.status(200).send(null)
-                else
-                    res.status(404).send("couldn't find doctor to delete")
-            })
+        console.log(`DELETE /images/favorited/${req.body.date}`);
+        // Images.findOneAndDelete({date: req.body.date})
+        //     .then(response => {
+        //         if (response)
+        //             res.status(200).send(null)
+        //         else
+        //             res.status(404).send("Couldn't find favorite image to delete")
+        //     })
+        res.status(200).send("Deleting from favorites")
     });
-    
-router.route("/doctors/:id/companions")
+
+router.route("/images/favorites")
     .get((req, res) => {
-        console.log(`GET /doctors/${req.params.id}/companions`);
-        Companion.find({ doctors: { $in: req.params.id } }).then(companions => {
-            res.status(200).send(companions);
-        })
-        .catch (err => {
-            res.status(404).send("Couldn't find doctor")
-        })
-    });
-    
+        console.log("GET /images/favorites");
 
-router.route("/doctors/:id/goodparent")
-    .get((req, res) => {
-        console.log(`GET /doctors/${req.params.id}/goodparent`);
-
-        Companion.find({ doctors: { $in: req.params.id } }).then(companions => {
-            for (let i = 0 ; i < companions.length; i++){
-                if (!companions[i].alive){
-                    res.status(200).send(false)
-                    return;
-                }
-                
-            }
-            res.status(200).send(true)
-        })
-        .catch (err => {
-            res.status(404).send("Couldn't find doctor")
-        })
-    });
-
-// optional:
-router.route("/doctors/favorites/:doctor_id")
-    .delete((req, res) => {
-        console.log(`DELETE /doctors/favorites/${req.params.doctor_id}`);
-        FavoriteDoctor.findByIdAndDelete(req.params.doctor_id)
-            .then(response => {
-                res.status(200).send(null)
-            })
-    });
-
-router.route("/companions")
-    .get((req, res) => {
-        console.log("GET /companions");
-        // already implemented:
-        Companion.find({})
-            .then(data => {
-                res.status(200).send(data);
-            })
-            .catch(err => {
-                res.status(500).send(err);
-            });
+        // Images.find({})
+        //     .then(data => {
+        //         res.status(200).send(data);
+        //     })
+        //     .catch(err => {
+        //         res.status(500).send(err);
+        //     });
+        var data = [{
+                "date": "2021-05-18",
+                "explanation": "What celestial body wears the Necklace Nebula? First, analyses indicate that the Necklace is a planetary nebula, a gas cloud emitted by a star toward the end of its life. Also, what appears to be diamonds in the Necklace are actually bright knots of glowing gas.  In the center of the Necklace Nebula are likely two stars orbiting so close together that they share a common atmosphere and appear as one in the featured image by the Hubble Space Telescope.  The red-glowing gas clouds on the upper left and lower right are the results of jets from the center.  Exactly when and how the bright jets formed remains a topic of research.  The Necklace Nebula is only about 5,000 years old, spans about 5 light years, and can best be found with a large telescope toward the direction of the constellation of the Arrow (Sagitta).",
+                "hdurl": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_2029.jpg",
+                "media_type": "image",
+                "service_version": "v1",
+                "title": "Jets from the Necklace Nebula",
+                "url": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_960.jpg"
+            },
+            {
+                "copyright": "Jason Guenzel",
+                "date": "2021-05-19",
+                "explanation": "Normally faint and elusive, the Jellyfish Nebula is caught in this alluring scene. In the telescopic field of view two bright yellowish stars, Mu and Eta Geminorum, stand just below and above the Jellyfish Nebula at the left. Cool red giants, they lie at the foot of the celestial twin. The Jellyfish Nebula itself floats below and left of center, a bright arcing ridge of emission with dangling tentacles. In fact, the cosmic jellyfish is part of bubble-shaped supernova remnant IC 443, the expanding debris cloud from a massive star that exploded. Light from that explosion first reached planet Earth over 30,000 years ago. Like its cousin in astrophysical waters the Crab Nebula supernova remnant, the Jellyfish Nebula is known to harbor a neutron star, the remnant of the collapsed stellar core. Composed on April 30, this telescopic snapshot also captures Mars. Now wandering through early evening skies, the Red Planet also shines with a yellowish glow on the right hand side of the field of view. Of course, the Jellyfish Nebula is about 5,000 light-years away, while Mars is currently almost 18 light-minutes from Earth.",
+                "hdurl": "https://apod.nasa.gov/apod/image/2105/Guenzel-JellyfishMars30APR2021.jpg",
+                "media_type": "image",
+                "service_version": "v1",
+                "title": "The Jellyfish and Mars",
+                "url": "https://apod.nasa.gov/apod/image/2105/Guenzel-JellyfishMars30APR2021_1000.jpg"
+            }]
+        res.status(200).send(data);
     })
     .post((req, res) => {
-        console.log("POST /companions");
-        Companion.create({
-            "name": req.body.name,
-            "character": req.body.character,
-            "doctors": req.body.doctors,
-            "seasons": req.body.seasons,
-            "alive": req.body.alive
-        }).save()
-            .then(companion => {
-                res.status(201).send(companion)
-            })
-            .catch(err => {
-                res.status(500).send("bad data for creating companion")
-            })
+        console.log(`POST /images/favorites/${req.body.date}`);
+        // Images.create({
+        //     "copyright": req.body.copyright,
+        //     "date": req.body.date,
+        //     "explanation": req.body.explanation,
+        //     "hdurl": req.body.hdurl,
+        //     "media_type": req.body.media_type,
+        //     "service_version": req.body.service_version,
+        //     "title": req.body.title,
+        //     "url": req.body.url 
+        // }).save()
+        //     .then(image => {
+        //         res.status(200).send()
+        //     })
+        //     .catch(err => {
+        //         res.status(500).send("bad data for posting to favorites")
+        //     })
+        var data = {
+            "date": "2021-05-18",
+            "explanation": "What celestial body wears the Necklace Nebula? First, analyses indicate that the Necklace is a planetary nebula, a gas cloud emitted by a star toward the end of its life. Also, what appears to be diamonds in the Necklace are actually bright knots of glowing gas.  In the center of the Necklace Nebula are likely two stars orbiting so close together that they share a common atmosphere and appear as one in the featured image by the Hubble Space Telescope.  The red-glowing gas clouds on the upper left and lower right are the results of jets from the center.  Exactly when and how the bright jets formed remains a topic of research.  The Necklace Nebula is only about 5,000 years old, spans about 5 light years, and can best be found with a large telescope toward the direction of the constellation of the Arrow (Sagitta).",
+            "hdurl": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_2029.jpg",
+            "media_type": "image",
+            "service_version": "v1",
+            "title": "Jets from the Necklace Nebula",
+            "url": "https://apod.nasa.gov/apod/image/2105/Necklace_Hubble_960.jpg"
+        }
+        res.status(200).send(data)
     });
 
-router.route("/companions/crossover")
-    .get((req, res) => {
-        console.log(`GET /companions/crossover`);
-        Companion.find({})
-        .then(companions => {
-            var result = [];
-            companions.forEach(function (companion) {
-                if (companion.doctors.length > 1)
-                    result.push(companion)
-            })
-            res.status(200).send(result)
-        })
-    });
 
-// optional:
-router.route("/companions/favorites")
-    .get((req, res) => {
-        console.log(`GET /companions/favorites`);
-        FavoriteCompanion.find({})
-            .then(favorite_companions => {
-                let favorite_companions_ids = []
-                favorite_companions.forEach(function (favorite_companion){
-                    favorite_companions_ids.push(favorite_companion.companion)
-                })
-                Companion.find({_id: {$in: favorite_companions_ids}})
-                    .then(companions => {
-                        res.status(200).send(companions)
-                    })
-            })
-            .catch(err => {
-                res.status(500).send(err)
-            })
-    })
-    .post((req, res) => {
-        console.log(`POST /companions/favorites`);
-        Companion.findOne({_id: req.body.companion_id})
-        .then(companion => {
-            FavoriteCompanion.findOne({companion: req.body.companion_id})
-                .then(companion2 => {
-                    if (companion2){
-                        res.status(500).send("Already in favorites.")
-                    }
-                    else {
-                        // console.log("found doctor is: ", doctor)
-                        if (companion) {
-                            FavoriteCompanion.create(companion._id).save()
-                            .then(favorite_companion => {
-                                res.status(201).send(companion)
-                            })
-                        }
-                        else  {
-                            res.status(500).send("Companion not found")
-                        }
-                    }
-                    
-                })
-            
-        })
-        .catch(err => {
-            //console.log("err2 is: ", err)
-            res.status(500).send("Bad data for creating companion favorite")
-        })
-    })
-
-router.route("/companions/:id")
-    .get((req, res) => {
-        console.log(`GET /companions/${req.params.id}`);
-        Companion.findById(req.params.id)
-            .then(companion => {
-                res.status(200).send(companion)
-            })
-            .catch(err => {
-                res.status(404).send("Couldn't find companion")
-            })
-    })
-    .patch((req, res) => {
-        console.log(`PATCH /companions/${req.params.id}`);
-        Companion.findOneAndUpdate(
-            {_id: req.params.id},
-            req.body,
-            {new: true}
-        ).then(companion => {
-            if (companion) {
-                res.status(200).send(companion)
-            }
-            else {
-                res.status(404).send("Companion not found.")
-            }
-        }).catch(() => res.status(501).send("Request was unsuccessful"))
-    })
-    .delete((req, res) => {
-        console.log(`DELETE /companions/${req.params.id}`);
-        Companion.findOneAndDelete({_id: req.params.id})
-            .then(response => {
-                if (response)
-                    res.status(200).send(null)
-                else
-                    res.status(404).send("Couldn't find companion to delete")
-            })
-    });
-
-router.route("/companions/:id/doctors")
-    .get((req, res) => {
-        console.log(`GET /companions/${req.params.id}/doctors`);
-        Companion.findById(req.params.id)
-            .then(companion => {
-                Doctor.find({_id: {$in: companion.doctors}})
-                    .then(doctors => {
-                        res.status(200).send(doctors)
-                    })})
-            .catch(err => {
-                res.status(404).send("Couldn't find companion")
-            })
-    });
-
-router.route("/companions/:id/friends")
-    .get((req, res) => {
-        console.log(`GET /companions/${req.params.id}/friends`);
-        Companion.findById(req.params.id).then(companion => {
-            Companion.find({$and: [{seasons: { $in: companion.seasons }}, {_id: {$not: {$eq: req.params.id}}}]})
-                .then(companions => {
-                    res.status(200).send(companions)
-                })
-                .catch (err => {
-                    res.status(404).send("Couldn't find companions.")
-            })
-            }).catch (err => {
-                res.status(404).send("Couldn't find companion")
-            })
-        
-    });
-
-// optional:
-router.route("/companions/favorites/:companion_id")
-    .delete((req, res) => {
-        console.log(`DELETE /companions/favorites/${req.params.companion_id}`);
-        FavoriteCompanion.findByIdAndDelete(req.params.companion_id)
-            .then(response => {
-                res.status(200).send(null)
-            })
-    });
 
 module.exports = router;
