@@ -90,7 +90,7 @@ router.route("/images")
         console.log(`GET /images`);
         var end_date = new Date().toISOString().slice(0, 10)
         var start_date = new Date()
-        start_date.setDate(start_date.getDate() - 7)
+        start_date.setDate(start_date.getDate() - 6)
         start_date = start_date.toISOString().slice(0, 10)
         console.log("today's date is: ", end_date)
         console.log("start date is: ", start_date)
@@ -105,7 +105,7 @@ router.route("/images")
 router.route("/images/favorited")
     .get((req, res) => {
         console.log(`GET /images/favorited`);
-        // Images.findOne({date: req.body.date})
+        // Images.findOne({date: req.headers.date})
         //     .then(response => {
         //         if (response)
         //             res.status(200).send(response)
