@@ -98,7 +98,7 @@ router.route("/images")
         fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}&start_date=${start_date}&end_date=${end_date}`)
             .then(response => response.json())
             .then(data => {
-                res.status(200).send(data)
+                res.status(200).send(data.reverse())
             })
     });
 
