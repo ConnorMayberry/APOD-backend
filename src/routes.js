@@ -109,6 +109,10 @@ router.route("/images/favorited")
         Images.findOne({date: req.headers.date})
             .then(response => {
                 if (response){
+                    res.set({
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*"
+                    })
                     res.status(200).send(response)
                 }
                 else
