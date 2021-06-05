@@ -11,26 +11,26 @@ const ImagesSchema = new Schema({
         type: Schema.Types.String,
         required: true
     },
-    hdurl: [{
+    hdurl: {
         type: Schema.Types.String, 
         required: true
-    }],
-    media_type: [{
+    },
+    media_type: {
         type: Schema.Types.String, 
         required: true
-    }],
-    service_version: [{
+    },
+    service_version: {
         type: Schema.Types.String, 
         required: true
-    }],
-    title: [{
+    },
+    title: {
         type: Schema.Types.String, 
         required: true
-    }],
-    url: [{
+    },
+    url: {
         type: Schema.Types.String, 
         required: true
-    }]
+    }
 });
 
 ImagesSchema.statics.create = function(obj) {
