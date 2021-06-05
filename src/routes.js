@@ -106,6 +106,7 @@ router.route("/images")
 router.route("/images/favorited")
     .get((req, res) => {
         console.log(`GET /images/favorited`);
+        console.log("req is: ", req)
         console.log("req.headers.date: ", req.header('date'))
         Images.findOne({date: req.header('date')})
             .then(response => {
