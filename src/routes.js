@@ -99,6 +99,7 @@ router.route("/images")
         fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}&start_date=${start_date}&end_date=${end_date}`)
             .then(response => response.json())
             .then(data => {
+                res.append('Access-Control-Allow-Origin', ['*'])
                 res.status(200).send(data.reverse())
             })
     });
@@ -108,8 +109,10 @@ router.route("/images/favorited")
         console.log(`GET /images/favorited`);
         Images.findOne({date: req.headers.date})
             .then(response => {
-                if (response)
+                if (response){
+                    res.append('Access-Control-Allow-Origin', ['*'])
                     res.status(200).send(response)
+                }
                 else
                     res.status(404).send(null)
             })
