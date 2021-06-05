@@ -109,7 +109,6 @@ router.route("/images/favorited")
         Images.findOne({date: req.headers.date})
             .then(response => {
                 if (response){
-                    res.append('Access-Control-Allow-Origin', ['*'])
                     res.status(200).send(response)
                 }
                 else
@@ -133,7 +132,7 @@ router.route("/images/favorited")
                 if (response)
                     res.status(200).send(null)
                 else
-                    res.status(404).send("Couldn't find favorite image to delete")
+                    res.status(200).send("Couldn't find favorite image to delete")
             })
         //res.status(200).send("Deleting from favorites")
     });
