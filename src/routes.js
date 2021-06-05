@@ -107,8 +107,8 @@ router.route("/images/favorited")
     .get((req, res) => {
         console.log(`GET /images/favorited`);
         console.log("req.headers is: ", req.headers)
-        console.log("req.headers.date: ", req.header('date'))
-        Images.findOne({date: req.header('date')})
+        console.log("req.headers.date: ", req.header('x-custom-header'))
+        Images.findOne({date: req.header('x-custom-header')})
             .then(response => {
                 if (response){
                     res.set({
