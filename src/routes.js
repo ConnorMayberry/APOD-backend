@@ -113,7 +113,7 @@ router.route("/images/favorited")
                     res.status(200).send(response)
                 }
                 else
-                    res.status(404).send(null)
+                    res.status(200).send(null)
             })
         // var data = {
         //         "date": "2021-05-18",
