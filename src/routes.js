@@ -113,7 +113,8 @@ router.route("/images/favorited")
                 if (response){
                     res.set({
                         "Content-Type": "application/json",
-                        "Access-Control-Allow-Origin": "*"
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
                     })
                     res.status(200).json(response)
                 }
