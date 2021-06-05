@@ -113,10 +113,10 @@ router.route("/images/favorited")
                         "Content-Type": "application/json",
                         "Access-Control-Allow-Origin": "*"
                     })
-                    res.status(200).send(response)
+                    res.status(200).json(response)
                 }
                 else
-                    res.status(200).send(null)
+                    res.status(200).json(null)
             })
         // var data = {
         //         "date": "2021-05-18",
