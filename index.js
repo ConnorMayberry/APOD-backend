@@ -16,6 +16,13 @@ app.use(express.json(bodyConfig));
 const middleware = require("./config/middleware");
 app.use(middleware.cors);
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, X-Custom-Header");
+    next();
+})
+
 const config = require("./config/config")[env || "development"];
 const mongoose = require("mongoose");
 
